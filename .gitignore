@@ -1,0 +1,4 @@
+maps.zip
+*.log
+node_modules/
+.env

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DBD Clock Maps</title>
+    <link rel="stylesheet" href="styles.css?v=20260606-3">
+    <script defer src="maps.js?v=20260606-3"></script>
+    <script defer src="app.js?v=20260606-3"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="toolbar" id="toolbar">
+        <div class="brand">
+          <strong>DBD Clock Maps</strong>
+          <span id="mapCount"></span>
+        </div>
+
+        <label class="field field-artist">
+          <span>Set</span>
+          <input id="artistSelect" type="text" autocomplete="off" spellcheck="false" placeholder="All sets">
+        </label>
+
+        <label class="field field-realm">
+          <span>Realm</span>
+          <input id="realmSelect" type="text" autocomplete="off" spellcheck="false" placeholder="All realms">
+        </label>
+
+        <label class="field field-search">
+          <span>Map</span>
+          <input id="searchInput" type="text" autocomplete="off" spellcheck="false" placeholder="Search">
+        </label>
+
+        <div class="sync-panel">
+          <input id="roomInput" class="room-input" type="text" maxlength="8" autocomplete="off" placeholder="Room">
+          <button id="hostButton" type="button">Host</button>
+          <button id="joinButton" type="button">Join</button>
+          <button id="leaveButton" type="button">Leave</button>
+          <button id="inviteButton" type="button">Invite</button>
+          <span id="syncStatus" class="status">Offline</span>
+        </div>
+
+        <div class="view-panel">
+          <button id="autoButton" type="button">Auto</button>
+          <button id="copyButton" type="button">Link</button>
+          <button id="cleanButton" type="button">Clean</button>
+          <label class="range-field">
+            <span>Opacity</span>
+            <input id="opacityInput" type="range" min="20" max="100" value="100">
+          </label>
+        </div>
+      </header>
+
+      <aside class="drawer" id="drawer">
+        <div id="mapList" class="map-list"></div>
+      </aside>
+
+      <main class="viewer">
+        <button id="prevButton" class="nav-button nav-prev" type="button">Prev</button>
+        <img id="mapImage" class="map-image" alt="">
+        <button id="nextButton" class="nav-button nav-next" type="button">Next</button>
+        <section class="overlay-hud" id="overlayHud">
+          <strong id="overlayTitle"></strong>
+          <button id="overlayLessButton" type="button">-</button>
+          <input id="overlayOpacityInput" type="range" min="20" max="100" value="100">
+          <button id="overlayMoreButton" type="button">+</button>
+          <button id="overlayUiButton" type="button">UI</button>
+        </section>
+        <section class="caption">
+          <strong id="mapTitle"></strong>
+          <span id="mapMeta"></span>
+          <span id="autoStatus"></span>
+        </section>
+      </main>
+
+      <video id="captureVideo" playsinline muted></video>
+      <canvas id="captureCanvas"></canvas>
+      <div id="suggestionMenu" class="suggestion-menu" hidden></div>
+    </div>
+  </body>
+</html>
