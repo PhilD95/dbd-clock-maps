@@ -1498,16 +1498,24 @@ window.DBD_MAPS = [
   {
     "artist": "SamoelColt",
     "realm": "Gideon Meat Plant",
-    "name": "The Game",
-    "path": "photo/SamoelColt/Gideon Meat Plant/The Game.jpg",
+    "name": "The Game (Both Floors)",
+    "path": "photo/SamoelColt/Gideon Meat Plant/The Game (Both Floors).webp",
+    "type": "webp",
+    "bytes": 523934
+  },
+  {
+    "artist": "SamoelColt",
+    "realm": "Gideon Meat Plant",
+    "name": "The Game (Floor 0)",
+    "path": "photo/SamoelColt/Gideon Meat Plant/The Game (Floor 0).jpg",
     "type": "jpg",
     "bytes": 1538749
   },
   {
     "artist": "SamoelColt",
     "realm": "Gideon Meat Plant",
-    "name": "The Game_1",
-    "path": "photo/SamoelColt/Gideon Meat Plant/The Game_1.jpg",
+    "name": "The Game (Floor -1)",
+    "path": "photo/SamoelColt/Gideon Meat Plant/The Game (Floor -1).jpg",
     "type": "jpg",
     "bytes": 1630308
   },
@@ -1578,16 +1586,24 @@ window.DBD_MAPS = [
   {
     "artist": "SamoelColt",
     "realm": "Raccoon City",
-    "name": "Raccoon City Police Station",
-    "path": "photo/SamoelColt/Raccoon City/Raccoon City Police Station.jpg",
+    "name": "Raccoon City Police Station (Both Floors)",
+    "path": "photo/SamoelColt/Raccoon City/Raccoon City Police Station (Both Floors).webp",
+    "type": "webp",
+    "bytes": 566150
+  },
+  {
+    "artist": "SamoelColt",
+    "realm": "Raccoon City",
+    "name": "Raccoon City Police Station (2nd Floor)",
+    "path": "photo/SamoelColt/Raccoon City/Raccoon City Police Station (2nd Floor).jpg",
     "type": "jpg",
     "bytes": 1528317
   },
   {
     "artist": "SamoelColt",
     "realm": "Raccoon City",
-    "name": "Raccoon City Police Station_1",
-    "path": "photo/SamoelColt/Raccoon City/Raccoon City Police Station_1.jpg",
+    "name": "Raccoon City Police Station (1st Floor)",
+    "path": "photo/SamoelColt/Raccoon City/Raccoon City Police Station (1st Floor).jpg",
     "type": "jpg",
     "bytes": 1509759
   },
@@ -1610,16 +1626,24 @@ window.DBD_MAPS = [
   {
     "artist": "SamoelColt",
     "realm": "Silent Hill",
-    "name": "Midwich  Elementary  School",
-    "path": "photo/SamoelColt/Silent Hill/Midwich  Elementary  School.jpg",
+    "name": "Midwich Elementary School (Both Floors)",
+    "path": "photo/SamoelColt/Silent Hill/Midwich Elementary School (Both Floors).webp",
+    "type": "webp",
+    "bytes": 576994
+  },
+  {
+    "artist": "SamoelColt",
+    "realm": "Silent Hill",
+    "name": "Midwich Elementary School (Floor 2)",
+    "path": "photo/SamoelColt/Silent Hill/Midwich Elementary School (Floor 2).jpg",
     "type": "jpg",
     "bytes": 1653817
   },
   {
     "artist": "SamoelColt",
     "realm": "Silent Hill",
-    "name": "Midwich  Elementary  School_1",
-    "path": "photo/SamoelColt/Silent Hill/Midwich  Elementary  School_1.jpg",
+    "name": "Midwich Elementary School (Floor 1)",
+    "path": "photo/SamoelColt/Silent Hill/Midwich Elementary School (Floor 1).jpg",
     "type": "jpg",
     "bytes": 1581652
   },
@@ -1666,16 +1690,24 @@ window.DBD_MAPS = [
   {
     "artist": "SamoelColt",
     "realm": "The Decimated Borgo",
-    "name": "Forgotten Ruins",
-    "path": "photo/SamoelColt/The Decimated Borgo/Forgotten Ruins.jpg",
+    "name": "Forgotten Ruins (Both Levels)",
+    "path": "photo/SamoelColt/The Decimated Borgo/Forgotten Ruins (Both Levels).webp",
+    "type": "webp",
+    "bytes": 643798
+  },
+  {
+    "artist": "SamoelColt",
+    "realm": "The Decimated Borgo",
+    "name": "Forgotten Ruins (Surface)",
+    "path": "photo/SamoelColt/The Decimated Borgo/Forgotten Ruins (Surface).jpg",
     "type": "jpg",
     "bytes": 1428108
   },
   {
     "artist": "SamoelColt",
     "realm": "The Decimated Borgo",
-    "name": "Forgotten Ruins_1",
-    "path": "photo/SamoelColt/The Decimated Borgo/Forgotten Ruins_1.jpg",
+    "name": "Forgotten Ruins (Underground)",
+    "path": "photo/SamoelColt/The Decimated Borgo/Forgotten Ruins (Underground).jpg",
     "type": "jpg",
     "bytes": 1819060
   },
