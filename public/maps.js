@@ -1501,7 +1501,7 @@ window.DBD_MAPS = [
     "name": "The Game (Both Floors)",
     "path": "photo/SamoelColt/Gideon Meat Plant/The Game (Both Floors).webp",
     "type": "webp",
-    "bytes": 523934
+    "bytes": 509224
   },
   {
     "artist": "SamoelColt",
