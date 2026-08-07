@@ -23,11 +23,7 @@
     status: document.getElementById("syncStatus"),
     copy: document.getElementById("copyButton"),
     clean: document.getElementById("cleanButton"),
-    opacity: document.getElementById("opacityInput"),
     overlayTitle: document.getElementById("overlayTitle"),
-    overlayOpacity: document.getElementById("overlayOpacityInput"),
-    overlayLess: document.getElementById("overlayLessButton"),
-    overlayMore: document.getElementById("overlayMoreButton"),
     overlayUi: document.getElementById("overlayUiButton"),
     auto: document.getElementById("autoButton"),
     autoStatus: document.getElementById("autoStatus"),
@@ -263,35 +259,61 @@
     els.suggestionMenu.replaceChildren();
   }
 
+  function suggestionLabel(option) {
+    return typeof option === "string" ? option : option.label;
+  }
+
+  function normalizeSuggestionGroups(options) {
+    if (!options.length) return [];
+    if (typeof options[0] === "object" && Array.isArray(options[0].options)) return options;
+    return [{ title: "", options }];
+  }
+
+  function sectionNode(title) {
+    const section = document.createElement("div");
+    section.className = "suggestion-section";
+    section.textContent = title;
+    return section;
+  }
+
   function showSuggestions(input, options, onPick, queryText = input.value) {
     const query = cleanText(queryText);
-    const visible = options
-      .filter((option) => !query || cleanText(option).includes(query))
-      .slice(0, 80);
+    const nodes = [];
+    let count = 0;
 
-    if (!visible.length) {
+    for (const group of normalizeSuggestionGroups(options)) {
+      const visible = group.options.filter((option) => !query || cleanText(suggestionLabel(option)).includes(query));
+      if (!visible.length) continue;
+      if (group.title) nodes.push(sectionNode(group.title));
+
+      for (const option of visible) {
+        if (count >= 90) break;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = suggestionLabel(option);
+        button.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+          onPick(option);
+          closeSuggestions();
+        });
+        nodes.push(button);
+        count += 1;
+      }
+    }
+
+    if (!count) {
       closeSuggestions();
       return;
     }
 
     const rect = input.getBoundingClientRect();
+    const compact = window.matchMedia("(max-width: 760px)").matches;
+    const toolbar = document.querySelector(".toolbar")?.getBoundingClientRect();
     els.suggestionMenu.style.left = `${Math.round(rect.left)}px`;
-    els.suggestionMenu.style.top = `${Math.round(rect.bottom + 4)}px`;
+    els.suggestionMenu.style.top = `${Math.round(compact && toolbar ? toolbar.bottom + 4 : rect.bottom + 4)}px`;
     els.suggestionMenu.style.width = `${Math.round(rect.width)}px`;
 
-    const buttons = visible.map((option) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = option;
-      button.addEventListener("mousedown", (event) => {
-        event.preventDefault();
-        onPick(option);
-        closeSuggestions();
-      });
-      return button;
-    });
-
-    els.suggestionMenu.replaceChildren(...buttons);
+    els.suggestionMenu.replaceChildren(...nodes);
     els.suggestionMenu.hidden = false;
   }
 
@@ -335,6 +357,90 @@
         return a.map.artist.localeCompare(b.map.artist);
       })
       .map(({ index }) => index);
+  }
+
+  function matchesArtistFilter(map) {
+    if (state.artist !== "all" && map.artist !== state.artist) return false;
+    if (state.artistQuery && !cleanText(map.artist).includes(state.artistQuery)) return false;
+    return true;
+  }
+
+  function matchesRealmFilter(map) {
+    const realm = canonicalRealm(map);
+    if (state.realm !== "all" && realm !== state.realm) return false;
+    if (state.realmQuery && !cleanText(realm).includes(state.realmQuery)) return false;
+    return true;
+  }
+
+  function matchesMapQuery(map) {
+    const query = cleanText(state.query);
+    const tokens = query ? query.split(" ") : [];
+    if (!tokens.length) return true;
+    const realm = canonicalRealm(map);
+    const haystack = cleanText(`${map.name} ${realm} ${map.realm} ${map.artist}`);
+    return tokens.every((token) => haystack.includes(token));
+  }
+
+  function groupedSuggestionOptions(matchingTitle, otherTitle, allLabel, options, isMatching) {
+    const matching = [];
+    const other = [];
+
+    for (const option of options) {
+      if (isMatching(option)) matching.push(option);
+      else other.push(option);
+    }
+
+    const first = allLabel ? [allLabel, ...matching] : matching;
+    if (!other.length) return [{ title: "", options: first }];
+    return [
+      { title: matchingTitle, options: first },
+      { title: otherTitle, options: other },
+    ];
+  }
+
+  function setSuggestionGroups() {
+    return groupedSuggestionOptions(
+      "Matching sets",
+      "Other sets",
+      "All sets",
+      creatorList(),
+      (artist) => maps.some((map) => map.artist === artist && matchesRealmFilter(map) && matchesMapQuery(map)),
+    );
+  }
+
+  function realmSuggestionGroups() {
+    return groupedSuggestionOptions(
+      "Matching realms",
+      "Other realms",
+      "All realms",
+      canonicalRealmList(),
+      (realm) => maps.some((map) => canonicalRealm(map) === realm && matchesArtistFilter(map) && matchesMapQuery(map)),
+    );
+  }
+
+  function mapSuggestionGroups() {
+    const matchingIndexes = filteredIndexes();
+    const matchingNames = unique(matchingIndexes.map((index) => maps[index].name));
+    const allNames = unique(maps.map((map) => map.name));
+    const matchingOptions = matchingNames.map((name) => ({
+      label: name,
+      index: matchingIndexes.find((index) => maps[index].name === name),
+    }));
+    const otherOptions = allNames
+      .filter((name) => !matchingNames.includes(name))
+      .map((name) => ({
+        label: name,
+        index: maps.findIndex((map) => map.name === name),
+      }));
+
+    if (!otherOptions.length) {
+      return [{ title: "", options: ["All maps", ...matchingOptions] }];
+    }
+
+    return [
+      { title: "Matching maps", options: ["All maps", ...matchingOptions] },
+      { title: "Other maps", options: otherOptions },
+    ];
   }
 
   function renderList() {
@@ -406,6 +512,7 @@
       setCurrent(indexes[0]);
     } else {
       renderList();
+      updateUrl();
     }
   }
 
@@ -694,13 +801,6 @@
     updateUrl();
   }
 
-  function setImageOpacity(value) {
-    const opacity = Math.min(100, Math.max(20, Number(value) || 100));
-    els.opacity.value = String(opacity);
-    els.overlayOpacity.value = String(opacity);
-    document.documentElement.style.setProperty("--image-opacity", String(opacity / 100));
-  }
-
   async function loadTesseract() {
     if (window.Tesseract) return;
     await new Promise((resolve, reject) => {
@@ -865,24 +965,53 @@
       renderList();
     });
 
-    attachSuggestionMenu(els.artist, () => ["All sets", ...creatorList()], (value) => {
+    attachSuggestionMenu(els.artist, setSuggestionGroups, (option) => {
+      const value = suggestionLabel(option);
       els.artist.value = value === "All sets" ? "" : value;
       updateArtistFilter(value);
       chooseFirstFiltered();
     });
 
-    attachSuggestionMenu(els.realm, () => ["All realms", ...canonicalRealmList()], (value) => {
+    attachSuggestionMenu(els.realm, realmSuggestionGroups, (option) => {
+      const value = suggestionLabel(option);
       els.realm.value = value === "All realms" ? "" : value;
       updateRealmFilter(value);
       chooseFirstFiltered();
     });
 
-    attachSuggestionMenu(els.search, () => ["All maps", ...unique(maps.map((map) => map.name))], (value) => {
+    attachSuggestionMenu(els.search, mapSuggestionGroups, (option) => {
+      const value = suggestionLabel(option);
       els.search.value = value === "All maps" ? "" : value;
       state.query = els.search.value;
-      const exact = filteredIndexes().find((index) => cleanText(maps[index].name) === cleanText(value));
-      if (Number.isInteger(exact)) setCurrent(exact);
-      else renderList();
+      if (value === "All maps") {
+        renderList();
+        return;
+      }
+
+      let exact = typeof option === "object" && Number.isInteger(option.index) ? option.index : undefined;
+      if (!Number.isInteger(exact)) {
+        exact = filteredIndexes().find((index) => cleanText(maps[index].name) === cleanText(value));
+      }
+      if (!Number.isInteger(exact)) {
+        exact = maps.findIndex((map) => cleanText(map.name) === cleanText(value));
+      }
+
+      if (Number.isInteger(exact) && maps[exact]) {
+        const selected = maps[exact];
+        const visible = filteredIndexes().includes(exact);
+        if (!visible) {
+          state.realm = canonicalRealm(selected);
+          state.realmQuery = "";
+          if (state.artist !== "all" && selected.artist !== state.artist) {
+            state.artist = selected.artist;
+            state.artistQuery = "";
+          }
+          syncFilterInputs();
+        }
+        setCurrent(exact);
+      } else {
+        renderList();
+      }
     });
 
     els.prev.addEventListener("click", () => {
@@ -914,10 +1043,6 @@
       else startAuto();
     });
 
-    els.opacity.addEventListener("input", () => setImageOpacity(els.opacity.value));
-    els.overlayOpacity.addEventListener("input", () => setImageOpacity(els.overlayOpacity.value));
-    els.overlayLess.addEventListener("click", () => setImageOpacity(Number(els.overlayOpacity.value) - 10));
-    els.overlayMore.addEventListener("click", () => setImageOpacity(Number(els.overlayOpacity.value) + 10));
     els.overlayUi.addEventListener("click", () => setCleanMode(false));
 
     window.addEventListener("keydown", (event) => {

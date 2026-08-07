@@ -4,9 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>DBD Clock Maps</title>
-    <link rel="stylesheet" href="styles.css?v=20260606-3">
-    <script defer src="maps.js?v=20260606-3"></script>
-    <script defer src="app.js?v=20260606-3"></script>
+    <link rel="stylesheet" href="styles.css?v=20260609-1">
   </head>
   <body>
     <div class="shell">
@@ -28,7 +26,7 @@
 
         <label class="field field-search">
           <span>Map</span>
-          <input id="searchInput" type="text" autocomplete="off" spellcheck="false" placeholder="Search">
+          <input id="searchInput" type="text" autocomplete="off" spellcheck="false" placeholder="All maps">
         </label>
 
         <div class="sync-panel">
@@ -44,10 +42,6 @@
           <button id="autoButton" type="button">Auto</button>
           <button id="copyButton" type="button">Link</button>
           <button id="cleanButton" type="button">Clean</button>
-          <label class="range-field">
-            <span>Opacity</span>
-            <input id="opacityInput" type="range" min="20" max="100" value="100">
-          </label>
         </div>
       </header>
 
@@ -61,9 +55,6 @@
         <button id="nextButton" class="nav-button nav-next" type="button">Next</button>
         <section class="overlay-hud" id="overlayHud">
           <strong id="overlayTitle"></strong>
-          <button id="overlayLessButton" type="button">-</button>
-          <input id="overlayOpacityInput" type="range" min="20" max="100" value="100">
-          <button id="overlayMoreButton" type="button">+</button>
           <button id="overlayUiButton" type="button">UI</button>
         </section>
         <section class="caption">
@@ -77,5 +68,7 @@
       <canvas id="captureCanvas"></canvas>
       <div id="suggestionMenu" class="suggestion-menu" hidden></div>
     </div>
+    <script src="maps.js?v=20260609-1"></script>
+    <script src="app.js?v=20260609-1"></script>
   </body>
 </html>

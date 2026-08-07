@@ -2,3 +2,6 @@ maps.zip
 *.log
 node_modules/
 .env
+.codex-vhx-player.js
+.playwright-mcp/
+gamebar-layout-after*.png
