@@ -47,6 +47,8 @@
       conns: [],
       eventSource: null,
       reconnectTimer: null,
+      watchdogTimer: null,
+      lastMessageAt: 0,
     },
     auto: {
       stream: null,
@@ -551,23 +553,52 @@
 
   async function postBackendState(index) {
     if (state.sync.mode !== "backend" || !state.sync.room) return;
-    try {
-      await fetch(`/api/rooms/${state.sync.room}/state`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selectionPayload(index)),
-      });
-    } catch {
+    const room = state.sync.room;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const response = await fetch(`/api/rooms/${room}/state`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(selectionPayload(index)),
+        });
+        if (!response.ok) throw new Error(`http ${response.status}`);
+        const source = state.sync.eventSource;
+        if (state.sync.mode === "backend" && state.sync.room === room && source && source.readyState === EventSource.OPEN) {
+          setStatus(`server ${state.sync.role} ${room}`, "live");
+        }
+        return;
+      } catch {
+        if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+      }
+    }
+    if (state.sync.mode === "backend" && state.sync.room === room) {
       setStatus("Backend lost", "error");
     }
+  }
+
+  function markSyncAlive() {
+    state.sync.lastMessageAt = Date.now();
+  }
+
+  function startSyncWatchdog(room, role) {
+    if (state.sync.watchdogTimer) window.clearInterval(state.sync.watchdogTimer);
+    state.sync.watchdogTimer = window.setInterval(() => {
+      if (state.sync.mode !== "backend" || state.sync.room !== room) return;
+      if (Date.now() - state.sync.lastMessageAt < 60000) return;
+      setStatus(`server ${role} reconnecting`, "error");
+      markSyncAlive();
+      openBackendEvents(room, role);
+    }, 10000);
   }
 
   function openBackendEvents(room, role) {
     if (state.sync.eventSource) state.sync.eventSource.close();
     const source = new EventSource(`/api/rooms/${room}/events?client=${clientId}`);
     state.sync.eventSource = source;
+    markSyncAlive();
 
     source.onopen = () => {
+      markSyncAlive();
       setStatus(`server ${role} ${room}`, "live");
       if (role === "host") {
         postBackendState(state.current);
@@ -575,6 +606,7 @@
     };
 
     source.addEventListener("state", (event) => {
+      markSyncAlive();
       const payload = JSON.parse(event.data);
       if (payload.clientId === clientId) return;
       if (Number.isInteger(payload.index) && maps[payload.index]) {
@@ -583,8 +615,11 @@
     });
 
     source.addEventListener("hello", () => {
+      markSyncAlive();
       setStatus(`server ${role} ${room}`, "live");
     });
+
+    source.addEventListener("ping", markSyncAlive);
 
     source.onerror = () => {
       if (state.sync.mode !== "backend") return;
@@ -610,6 +645,7 @@
     setStatus(`server ${role} ${room}`, "live");
 
     openBackendEvents(room, role);
+    startSyncWatchdog(room, role);
 
     if (role === "host") {
       postBackendState(state.current);
@@ -620,8 +656,11 @@
 
   function refreshBackendConnection() {
     if (state.sync.mode !== "backend" || !state.sync.room) return;
-    const closed = !state.sync.eventSource || state.sync.eventSource.readyState === EventSource.CLOSED;
-    if (closed) {
+    const source = state.sync.eventSource;
+    const closed = !source || source.readyState === EventSource.CLOSED;
+    const stale = Date.now() - state.sync.lastMessageAt > 60000;
+    if (closed || stale) {
+      markSyncAlive();
       openBackendEvents(state.sync.room, state.sync.role);
     }
     if (state.sync.role === "host") {
@@ -736,6 +775,7 @@
 
   function cleanupSync() {
     if (state.sync.reconnectTimer) window.clearTimeout(state.sync.reconnectTimer);
+    if (state.sync.watchdogTimer) window.clearInterval(state.sync.watchdogTimer);
     if (state.sync.eventSource) state.sync.eventSource.close();
     if (state.sync.peer) state.sync.peer.destroy();
     state.sync.conns.forEach((conn) => conn.close?.());
@@ -746,6 +786,8 @@
     state.sync.conns = [];
     state.sync.eventSource = null;
     state.sync.reconnectTimer = null;
+    state.sync.watchdogTimer = null;
+    state.sync.lastMessageAt = 0;
     syncControls(false);
     setStatus("Offline");
   }
@@ -1046,6 +1088,8 @@
     els.overlayUi.addEventListener("click", () => setCleanMode(false));
 
     window.addEventListener("keydown", (event) => {
+      const target = event.target;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
       if (event.key === "Escape" || event.key.toLowerCase() === "h") setCleanMode(!state.clean);
       if (event.key === "ArrowLeft") els.prev.click();
       if (event.key === "ArrowRight") els.next.click();
