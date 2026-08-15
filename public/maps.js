@@ -1589,7 +1589,7 @@ window.DBD_MAPS = [
     "name": "Raccoon City Police Station (Both Floors)",
     "path": "photo/SamoelColt/Raccoon City/Raccoon City Police Station (Both Floors).webp",
     "type": "webp",
-    "bytes": 566150
+    "bytes": 703770
   },
   {
     "artist": "SamoelColt",
