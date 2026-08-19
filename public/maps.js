@@ -1693,7 +1693,7 @@ window.DBD_MAPS = [
     "name": "Forgotten Ruins (Both Levels)",
     "path": "photo/SamoelColt/The Decimated Borgo/Forgotten Ruins (Both Levels).webp",
     "type": "webp",
-    "bytes": 643798
+    "bytes": 758748
   },
   {
     "artist": "SamoelColt",
