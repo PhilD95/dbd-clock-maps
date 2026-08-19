@@ -5,3 +5,7 @@ node_modules/
 .codex-vhx-player.js
 .playwright-mcp/
 gamebar-layout-after*.png
+
+viewer/webview2-sdk/
+viewer/*.dll
+viewer.zip
